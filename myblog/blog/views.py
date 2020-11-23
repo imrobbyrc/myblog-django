@@ -5,8 +5,11 @@ from .forms import PostForm, CommentForm
 
 # Create your views here.
 def post_list(request):
-
     posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
+    query_string = request.GET.get('category')
+    if query_string:
+        posts = Post.objects.filter(published_date__lte=timezone.now(), category__name=query_string).order_by('published_date')
+    
     categories = Category.objects.all()
     context = {
         'posts' : posts,
@@ -17,15 +20,31 @@ def post_list(request):
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
     comments = Comment.objects.filter(post_id=pk).order_by('id')
-    if request.method == "POST":
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.post_id = pk
-            post.save()
-            return redirect('blog:post_detail', pk=pk)
+
+    query_string = request.GET.get('comment_id')
+    if query_string:
+        comment = get_object_or_404(Comment, pk=query_string)
+        comment_form = CommentForm(instance=comment)
+        if request.method == "POST":
+            form = CommentForm(request.POST, instance=comment)
+            if form.is_valid():
+                form.save()
+                return redirect('blog:post_detail', pk=post.pk)
+
     else:
-        comment_form = CommentForm()
+        if request.method == "POST":
+            form = CommentForm(request.POST)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.comentator = request.user
+                post.post_id = pk
+                post.save()
+                return redirect('blog:post_detail', pk=pk)
+        else:
+            comment_form = CommentForm()
+
+    
+
     context = {
         'post' : post,
         'comments' : comments,
@@ -63,5 +82,9 @@ def post_edit(request, pk):
     return render(request, 'blog/post_edit.html', {'form': form})
 
 def post_delete(request, pk):
-    delete = Post.objects.filter(id=pk).delete()
+    delete = Post.objects.get(id=pk).delete()
     return redirect('blog:post_list')
+
+def comment_delete(request, post_id, pk):
+    delete = Comment.objects.get(id=pk).delete()
+    return redirect('blog:post_detail', pk=post_id)

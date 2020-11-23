@@ -80,12 +80,22 @@ WSGI_APPLICATION = 'myblog.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'myblog',
+#         'USER': 'root',
+#         'PASSWORD': 'qwerty123',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'mysql.connector.django',
         'NAME': 'myblog',
         'USER': 'root',
-        'PASSWORD': 'qwerty123',
+        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '3306',
     }
