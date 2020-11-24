@@ -3,6 +3,7 @@ from django.utils import timezone
 from .models import Post,Category, Comment
 from .forms import PostForm, CommentForm
 from django.db.models import Count
+from django.contrib import messages
 
 # Create your views here.
 def post_list(request):
@@ -64,6 +65,7 @@ def post_new(request):
             post.published_date = timezone.now()
             post.save()
             form.save_m2m()
+            messages.success(request, 'New Post Added')
             return redirect('blog:post_detail', pk=post.pk)
     else:
         form = PostForm()
@@ -79,6 +81,7 @@ def post_edit(request, pk):
             post.published_date = timezone.now()
             post.save()
             form.save_m2m()
+            messages.success(request, 'This Post Edited ')
             return redirect('blog:post_detail', pk=post.pk)
     else:
         form = PostForm(instance=post)
@@ -86,8 +89,10 @@ def post_edit(request, pk):
 
 def post_delete(request, pk):
     delete = Post.objects.get(id=pk).delete()
+    messages.success(request, 'Post Deleted')
     return redirect('blog:post_list')
 
 def comment_delete(request, post_id, pk):
     delete = Comment.objects.get(id=pk).delete()
+    messages.success(request, 'Comment Deleted')
     return redirect('blog:post_detail', pk=post_id)

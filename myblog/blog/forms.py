@@ -42,11 +42,19 @@ class PostForm(forms.ModelForm):
             ),
         }
     
+    #validasi
     def clean_title(self):
-        check_title = Post.objects.filter(title=self.cleaned_data.get('title')).count()
-        if check_title > 0:
+        cleaned_title = self.cleaned_data.get('title')
+        check_title = Post.objects.filter(title=cleaned_title)
+
+        if self.instance:
+            check_title = check_title.exclude(pk=self.instance.pk)
+
+        if check_title.exists():
             raise ValidationError("This Article already published")
-        return self.cleaned_data.get('title')
+
+        return cleaned_title
+
 
 class CommentForm(forms.ModelForm):
 
