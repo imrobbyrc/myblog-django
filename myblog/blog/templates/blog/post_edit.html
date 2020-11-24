@@ -4,7 +4,19 @@
     <h2>New post</h2>
     <form method="POST" class="post-form">
         {% csrf_token %}
-        {{ form.as_p }}
+        {% comment %} {{ form.as_p }} {% endcomment %}
+        {% for form_row in form  %}
+            <div class="form-group">
+                {{form_row.label_tag}}
+                {{form_row}}
+                {% if  form_row.errors %}
+                <div class="invalid-feedback">
+                    {{ form_row.errors|striptags }}
+                </div>
+                {% endif %}
+            </div>
+            
+        {% endfor %}
         <button type="submit" class="save btn btn-primary">Save</button>
     </form>
 {% endblock %}

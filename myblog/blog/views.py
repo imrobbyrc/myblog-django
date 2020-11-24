@@ -2,6 +2,7 @@ from django.shortcuts import render,get_object_or_404, redirect
 from django.utils import timezone
 from .models import Post,Category, Comment
 from .forms import PostForm, CommentForm
+from django.db.models import Count
 
 # Create your views here.
 def post_list(request):
@@ -10,7 +11,9 @@ def post_list(request):
     if query_string:
         posts = Post.objects.filter(published_date__lte=timezone.now(), category__name=query_string).order_by('published_date')
     
-    categories = Category.objects.all()
+    #total post dll
+    categories = Category.objects.annotate(count_post=Count('post'))
+    #categories = Category.objects.all()
     context = {
         'posts' : posts,
         'categories' : categories

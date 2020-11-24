@@ -1,8 +1,19 @@
 from django import forms
 from .models import Post,Comment
+# from django.db.models import Count
+from django.core.exceptions import ValidationError
 
 class PostForm(forms.ModelForm):
 
+    error_css_class = 'is-invalid'
+    def __init__(self,*args, **kwargs):
+        super(PostForm, self).__init__(*args, **kwargs)
+        if self.errors:
+            for form_name in self.errors:
+                classes = self.fields[form_name].widget.attrs.get("class")
+                classes += ' is-invalid'
+                self.fields[form_name].widget.attrs['class'] = classes
+    # required_css_class = 'required'
     class Meta:
         model = Post
         fields = ('title', 'text','category')
@@ -10,7 +21,7 @@ class PostForm(forms.ModelForm):
             "title" : "Title",
             "text"  : "Body Blog",
             "category" : "Category",
-            }
+        }
 
         widgets = {
             'title' : forms.TextInput(
@@ -32,7 +43,10 @@ class PostForm(forms.ModelForm):
         }
     
     def clean_title(self):
-        pass
+        check_title = Post.objects.filter(title=self.cleaned_data.get('title')).count()
+        if check_title > 0:
+            raise ValidationError("This Article already published")
+        return self.cleaned_data.get('title')
 
 class CommentForm(forms.ModelForm):
 

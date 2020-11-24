@@ -1,11 +1,11 @@
 {% extends 'blog/base.html' %}
-{% block category_list %}
+{% comment %} {% block category_list %}
     {% for category in context.categories %}
     <li class="nav-item {% if  request.GET.category == category.name.lower  %} active {% endif %}">
         <a class="nav-link" href="/?category={{ category.name.lower }}">{{ category.name }}</a>
     </li>
     {% endfor %}
-{% endblock category_list %}
+{% endblock category_list %} {% endcomment %}
 
 {% block contents %}
     {% for post in context.posts %}
@@ -15,7 +15,7 @@
             </div>
             <div class="card-body">
                 <h5 class="card-title"> {{ post.title }} </h5>
-                <p class="card-text">{{ post.text|linebreaksbr|truncatechars:500 }} <a href="{% url 'blog:post_detail' pk=post.pk %}" class="">Read More</a> </p>
+                <p class="card-text">{{ post.text|linebreaksbr|truncatechars:350 }} <a href="{% url 'blog:post_detail' pk=post.pk %}" class="">Read More</a> </p>
             </div>
             <div class="card-footer text-muted">
                 Categories :{% for cat in  post.category.all %} <a href="/?category={{ cat.name.lower }}" class="badge badge-info">{{cat}}</a> {% endfor %}
@@ -23,3 +23,14 @@
         </div>
     {% endfor %}
 {% endblock contents %}
+
+{% block sidebar_contents %}
+{% for category in context.categories %}
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5><a href="/?category={{ category.name.lower }}">{{category.name}}</a> <span class="badge badge-secondary">{{category.count_post}}</span></h5>
+                   
+        </div>
+    </div>
+{% endfor %}
+{% endblock sidebar_contents %}
