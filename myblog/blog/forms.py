@@ -72,3 +72,12 @@ class CommentForm(forms.ModelForm):
                 }
             ),
         }
+    
+    def clean_text(self):
+        badwords = ['cacad','tai','goblok','tolol','ampas','wakwaw','bege']
+        cleaned_text = self.cleaned_data.get('text')
+        for badword in badwords:
+            cleaned_text = cleaned_text.replace(badword,"*"*len(badword))
+
+        
+        return cleaned_text

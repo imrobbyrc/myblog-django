@@ -11,10 +11,10 @@ def post_list(request):
     query_string = request.GET.get('category')
     if query_string:
         posts = Post.objects.filter(published_date__lte=timezone.now(), category__name=query_string).order_by('published_date')
-    
-    #total post dll
+
+    if posts.count() < 1:
+        messages.error(request, f'No post in {query_string} category found')
     categories = Category.objects.annotate(count_post=Count('post'))
-    #categories = Category.objects.all()
     context = {
         'posts' : posts,
         'categories' : categories
